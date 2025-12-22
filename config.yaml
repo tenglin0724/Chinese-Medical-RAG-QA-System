@@ -1,0 +1,87 @@
+# 数据配置
+data:
+  dataset_path: "./dataset/cMedQA2"
+  question_file: "question.csv"
+  answer_file: "answer.csv"
+  train_file: "train_candidates.txt"
+  dev_file: "dev_candidates.txt"
+  test_file: "test_candidates.txt"
+  processed_data_dir: "./data/processed"
+  vector_store_dir: "./data/vector_store"
+  
+# 向量模型配置
+embedding:
+  model_name: "BAAI/bge-large-zh-v1.5"  # 中文向量模型
+  model_path: "/data1/tenglin/models/bge-base-zh-v1.5"  # 本地模型路径
+  device: "cuda:7"
+  batch_size: 32
+  max_length: 512
+  
+# 文本分块配置
+chunking:
+  chunk_size: 1024
+  chunk_overlap: 64
+  separators: ["\n\n", "\n", "。", "！", "？", "；", "，"]
+  
+# 向量数据库配置
+vector_store:
+  type: "faiss"  # 可选: faiss, chromadb
+  faiss_index_type: "IndexFlatL2"
+  top_k: 5
+  score_threshold: 0.7
+  
+# LLM配置
+llm:
+  provider: "qwen"  # 可选: qwen, local, vllm
+  model_name: "qwen-plus"
+  api_key_env: "DASHSCOPE_API_KEY"
+  temperature: 0.7
+  max_tokens: 2048
+  streaming: true
+  
+  # 本地模型配置 (当provider为local时使用)
+  # model_path: "/data1/tenglin/models/Qwen3-4B-Instruct-2507"  # 本地模型路径
+  # device: "cuda"  # 或 "cpu"
+  
+  # vLLM服务器配置 (当provider为vllm时使用)
+  base_url: "http://localhost:8000/v1"  # vLLM服务器地址
+  model_name: "Qwen2.5-7B-Instruct"  # vLLM中加载的模型名称
+  
+# Prompt配置
+prompt:
+  system_prompt: |
+    你是一个专业的中文医疗问答助手。你需要根据提供的医疗知识库内容来回答用户的健康相关问题。
+    
+    要求：
+    1. 基于提供的上下文信息进行回答
+    2. 如果上下文中没有相关信息，明确说明"根据现有信息无法回答"
+    3. 回答要专业、准确、易懂
+    4. 必要时引用信息来源
+    5. 提醒用户：本系统仅供参考，具体诊疗请咨询专业医生
+    
+  query_prompt: |
+    参考上下文信息回答问题。
+    
+    上下文信息：
+    {context}
+    
+    问题：{question}
+    
+    请基于上述上下文信息回答问题。如果上下文中没有相关信息，请说明无法回答。
+    
+# 评估配置
+evaluation:
+  metrics: ["accuracy", "f1", "rouge", "hallucination_rate"]
+  test_sample_size: 100
+  
+# 部署配置
+deployment:
+  interface: "gradio"  # 可选: gradio, streamlit, fastapi
+  host: "0.0.0.0"
+  port: 7860
+  share: false
+  
+# 日志配置
+logging:
+  level: "INFO"
+  log_file: "./logs/rag_system.log"

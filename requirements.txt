@@ -1,0 +1,41 @@
+# RAG核心依赖
+langchain>=0.1.0
+langchain-community>=0.0.10
+langchain-openai>=0.0.5
+chromadb>=0.4.22
+faiss-cpu>=1.7.4
+
+# 向量模型
+sentence-transformers>=2.2.2
+transformers>=4.35.0
+torch>=2.0.0
+accelerate>=0.24.0
+
+# 大语言模型支持
+openai>=1.10.0
+dashscope>=1.14.0  # 阿里云通义千问
+vllm>=0.3.0  # vLLM服务器（可选）
+
+# Web界面
+gradio>=4.16.0
+streamlit>=1.29.0
+
+# 数据处理
+pandas>=2.0.0
+numpy>=1.24.0
+jieba>=0.42.1
+
+# 评估
+rouge-chinese>=1.0.3
+nltk>=3.8.0
+
+# 工具
+tqdm>=4.65.0
+pyyaml>=6.0
+python-dotenv>=1.0.0
+loguru>=0.7.0
+
+# Jupyter支持
+jupyter>=1.0.0
+notebook>=7.0.0
+ipykernel>=6.25.0
