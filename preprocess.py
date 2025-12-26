@@ -11,7 +11,6 @@ from src.vector_store import VectorStore
 
 
 def main():
-    """主函数"""
     # 配置日志
     logger.add(
         "logs/preprocessing.log",

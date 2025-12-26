@@ -6,7 +6,6 @@ from typing import List, Dict, Tuple
 import numpy as np
 from loguru import logger
 from sentence_transformers import SentenceTransformer
-import faiss
 
 
 class VectorStore:
@@ -31,7 +30,7 @@ class VectorStore:
         )
         
         # 向量数据库
-        self.index = None
+        self.index = None  # 存储所有文档的向量矩阵
         self.documents = []
         self.dimension = None
         
@@ -65,24 +64,21 @@ class VectorStore:
         # 提取文本
         texts = [doc['content'] for doc in documents]
         
-        # 生成向量
+        # 生成向量并存储为矩阵
         embeddings = self.embed_texts(texts)
         self.dimension = embeddings.shape[1]
         
-        # 构建FAISS索引
-        if self.vector_store_config['type'] == 'faiss':
-            # 使用L2距离的平坦索引
-            self.index = faiss.IndexFlatL2(self.dimension)
-            self.index.add(embeddings.astype('float32'))
+        # 直接存储向量矩阵（已经归一化）
+        self.index = embeddings.astype('float32')
         
         # 保存文档
         self.documents = documents
         
-        logger.info(f"向量索引构建完成，维度: {self.dimension}")
+        logger.info(f"向量索引构建完成，维度: {self.dimension}, 文档数: {len(documents)}")
     
     def search(self, query: str, top_k: int = None) -> List[Dict]:
         """
-        检索相关文档
+        检索相关文档（使用余弦相似度）
         
         Args:
             query: 查询文本
@@ -98,21 +94,22 @@ class VectorStore:
             top_k = self.vector_store_config['top_k']
         
         # 查询向量化
-        query_embedding = self.embed_texts([query])
+        query_embedding = self.embed_texts([query])[0]  # 获取单个向量
         
-        # 检索
-        distances, indices = self.index.search(
-            query_embedding.astype('float32'), 
-            top_k
-        )
+        # 计算余弦相似度（向量已归一化，所以就是点积）
+        similarities = np.dot(self.index, query_embedding)
+        
+        # 获取top_k个最相似的文档索引
+        top_k = min(top_k, len(self.documents))
+        top_indices = np.argsort(similarities)[::-1][:top_k]
         
         # 组织结果
         results = []
-        for i, (distance, idx) in enumerate(zip(distances[0], indices[0])):
+        for rank, idx in enumerate(top_indices, 1):
             if idx < len(self.documents):
                 doc = self.documents[idx].copy()
-                doc['score'] = float(1 / (1 + distance))  # 转换为相似度分数
-                doc['rank'] = i + 1
+                doc['score'] = float(similarities[idx])  # 余弦相似度分数
+                doc['rank'] = rank
                 results.append(doc)
         
         return results
@@ -126,11 +123,11 @@ class VectorStore:
         """
         os.makedirs(save_dir, exist_ok=True)
         
-        # 保存FAISS索引
+        # 保存向量索引
         if self.index is not None:
-            index_path = os.path.join(save_dir, 'faiss.index')
-            faiss.write_index(self.index, index_path)
-            logger.info(f"FAISS索引已保存到: {index_path}")
+            index_path = os.path.join(save_dir, 'embeddings.npy')
+            np.save(index_path, self.index)
+            logger.info(f"向量索引已保存到: {index_path}")
         
         # 保存文档
         docs_path = os.path.join(save_dir, 'documents.pkl')
@@ -155,11 +152,11 @@ class VectorStore:
         Args:
             load_dir: 加载目录
         """
-        # 加载FAISS索引
-        index_path = os.path.join(load_dir, 'faiss.index')
+        # 加载向量索引
+        index_path = os.path.join(load_dir, 'embeddings.npy')
         if os.path.exists(index_path):
-            self.index = faiss.read_index(index_path)
-            logger.info(f"FAISS索引已加载: {index_path}")
+            self.index = np.load(index_path)
+            logger.info(f"向量索引已加载: {index_path}")
         
         # 加载文档
         docs_path = os.path.join(load_dir, 'documents.pkl')

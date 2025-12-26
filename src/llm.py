@@ -6,19 +6,10 @@ from abc import ABC, abstractmethod
 from loguru import logger
 import dashscope
 from http import HTTPStatus
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+from openai import OpenAI
 
-try:
-    from transformers import AutoTokenizer, AutoModelForCausalLM
-    import torch
-    TRANSFORMERS_AVAILABLE = True
-except ImportError:
-    TRANSFORMERS_AVAILABLE = False
-
-try:
-    from openai import OpenAI
-    OPENAI_AVAILABLE = True
-except ImportError:
-    OPENAI_AVAILABLE = False
 
 
 class BaseLLM(ABC):
@@ -144,18 +135,8 @@ class LocalLLM(BaseLLM):
     """本地部署的LLM（使用Transformers）"""
     
     def __init__(self, config: dict):
-        """
-        初始化本地LLM
-        
-        Args:
-            config: 配置字典
-        """
-        if not TRANSFORMERS_AVAILABLE:
-            raise ImportError("请安装transformers库: pip install transformers torch")
-        
         self.config = config
         llm_config = config['llm']
-        
         self.model_path = llm_config.get('model_path', llm_config['model_name'])
         self.device = llm_config.get('device', 'cuda' if torch.cuda.is_available() else 'cpu')
         self.temperature = llm_config.get('temperature', 0.7)
@@ -163,7 +144,6 @@ class LocalLLM(BaseLLM):
         
         logger.info(f"加载本地模型: {self.model_path}")
         logger.info(f"使用设备: {self.device}")
-        
         # 加载tokenizer和模型
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.model_path,
@@ -259,23 +239,13 @@ class LocalLLM(BaseLLM):
 
 
 class VLLMServer(BaseLLM):
-    """vLLM服务器LLM（兼容OpenAI API）"""
     
     def __init__(self, config: dict):
-        """
-        初始化vLLM服务器连接
-        
-        Args:
-            config: 配置字典
-        """
-        if not OPENAI_AVAILABLE:
-            raise ImportError("请安装openai库: pip install openai")
-        
         self.config = config
         llm_config = config['llm']
         
         # vLLM服务器地址
-        self.base_url = llm_config.get('base_url', 'http://localhost:8000/v1')
+        self.base_url = llm_config.get('base_url', 'http://127.0.0.1:8000/v1')
         self.model_name = llm_config.get('model_name', 'default')
         self.temperature = llm_config.get('temperature', 0.7)
         self.max_tokens = llm_config.get('max_tokens', 2048)
@@ -283,25 +253,16 @@ class VLLMServer(BaseLLM):
         # 创建OpenAI客户端连接到vLLM
         self.client = OpenAI(
             base_url=self.base_url,
-            api_key='sk'  # vLLM不需要真实的API key
+            api_key='sk'  
         )
         
         logger.info(f"连接到vLLM服务器: {self.base_url}")
         logger.info(f"使用模型: {self.model_name}")
     
     def generate(self, prompt: str, system_prompt: str = None, **kwargs) -> str:
-        """
-        生成回复
-        
-        Args:
-            prompt: 用户提示
-            system_prompt: 系统提示
-            **kwargs: 其他参数
-            
-        Returns:
-            生成的文本
-        """
         messages = []
+        print(system_prompt)
+        print(prompt)
         if system_prompt:
             messages.append({'role': 'system', 'content': system_prompt})
         messages.append({'role': 'user', 'content': prompt})
@@ -313,6 +274,7 @@ class VLLMServer(BaseLLM):
                 temperature=kwargs.get('temperature', self.temperature),
                 max_tokens=kwargs.get('max_tokens', self.max_tokens)
             )
+            print(response)
             
             return response.choices[0].message.content
         

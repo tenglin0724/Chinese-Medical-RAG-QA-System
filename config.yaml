@@ -11,7 +11,6 @@ data:
   
 # 向量模型配置
 embedding:
-  model_name: "BAAI/bge-large-zh-v1.5"  # 中文向量模型
   model_path: "/data1/tenglin/models/bge-base-zh-v1.5"  # 本地模型路径
   device: "cuda:7"
   batch_size: 32
@@ -25,27 +24,23 @@ chunking:
   
 # 向量数据库配置
 vector_store:
-  type: "faiss"  # 可选: faiss, chromadb
+  type: "faiss"  
   faiss_index_type: "IndexFlatL2"
   top_k: 5
-  score_threshold: 0.7
+  score_threshold: 0.3
   
 # LLM配置
 llm:
-  provider: "qwen"  # 可选: qwen, local, vllm
-  model_name: "qwen-plus"
+  provider: "vllm"  # 可选: qwen, local, vllm
+  model_name: "qwen3-1.7B"
   api_key_env: "DASHSCOPE_API_KEY"
   temperature: 0.7
   max_tokens: 2048
   streaming: true
   
-  # 本地模型配置 (当provider为local时使用)
-  # model_path: "/data1/tenglin/models/Qwen3-4B-Instruct-2507"  # 本地模型路径
-  # device: "cuda"  # 或 "cpu"
-  
   # vLLM服务器配置 (当provider为vllm时使用)
-  base_url: "http://localhost:8000/v1"  # vLLM服务器地址
-  model_name: "Qwen2.5-7B-Instruct"  # vLLM中加载的模型名称
+  base_url: "http://127.0.0.1:8000/v1"  
+  model_name: "Qwen3-1.7B"  
   
 # Prompt配置
 prompt:
@@ -76,7 +71,7 @@ evaluation:
   
 # 部署配置
 deployment:
-  interface: "gradio"  # 可选: gradio, streamlit, fastapi
+  interface: "gradio" 
   host: "0.0.0.0"
   port: 7860
   share: false

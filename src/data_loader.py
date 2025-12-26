@@ -208,11 +208,6 @@ def preprocess_text(text: str) -> str:
     # 去除多余空白
     text = ' '.join(text.split())
     
-    # 可以添加更多预处理步骤
-    # - 去除特殊字符
-    # - 统一标点符号
-    # 等等
-    
     return text.strip()
 
 

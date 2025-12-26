@@ -13,8 +13,8 @@ accelerate>=0.24.0
 
 # 大语言模型支持
 openai>=1.10.0
-dashscope>=1.14.0  # 阿里云通义千问
-vllm>=0.3.0  # vLLM服务器（可选）
+dashscope>=1.14.0  
+vllm>=0.3.0  
 
 # Web界面
 gradio>=4.16.0

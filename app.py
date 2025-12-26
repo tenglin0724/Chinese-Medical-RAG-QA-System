@@ -10,8 +10,6 @@ from src.rag_system import MedicalRAGSystem
 
 
 class MedicalRAGWebUI:
-    """医疗RAG Web界面"""
-    
     def __init__(self, config_path: str = "config.yaml"):
         """
         初始化Web界面
