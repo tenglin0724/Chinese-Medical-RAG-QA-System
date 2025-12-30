@@ -51,8 +51,8 @@
 
 | Metric | Top-1 | Top-3 | Top-5 |
 | :--- | :---: | :---: | :---: |
-| **Retrieval Hit Rate** | 45.2% | 68.5% | 78.3% |
-| **Generation Accuracy** | - | - | 62.1% |
+| **Retrieval Hit Rate** | 23.2% | 35.5% | 40.3% |
+| **Generation Accuracy** | - | - | 37.1% |
 
 
 ## 5. 问题分析与创新点

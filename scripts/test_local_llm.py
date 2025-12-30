@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""本地LLM使用示例"""
 
 import yaml
 from loguru import logger
@@ -9,7 +8,6 @@ from src.rag_system import MedicalRAGSystem
 
 
 def main():
-    """主函数"""
     # 加载环境变量
     load_dotenv()
     
@@ -48,13 +46,10 @@ def main():
         logger.info(f"问题: {question}")
         logger.info("-"*80)
         
-        # 查询
         result = rag_system.query(question, use_history=False)
         
-        # 打印答案
         logger.info(f"回答: {result['answer']}")
         
-        # 打印来源
         logger.info(f"\n检索到 {len(result['sources'])} 条相关来源:")
         for j, source in enumerate(result['sources'][:2], 1):
             logger.info(f"\n  来源 {j} (相似度: {source['score']:.3f}):")

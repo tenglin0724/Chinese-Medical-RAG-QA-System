@@ -247,7 +247,6 @@ class MedicalRAGWebUI:
 
 
 if __name__ == "__main__":
-    # 配置日志
     logger.add(
         "logs/web_ui.log",
         rotation="500 MB",
@@ -255,6 +254,5 @@ if __name__ == "__main__":
         level="INFO"
     )
     
-    # 创建并启动Web界面
     web_ui = MedicalRAGWebUI()
     web_ui.launch()
