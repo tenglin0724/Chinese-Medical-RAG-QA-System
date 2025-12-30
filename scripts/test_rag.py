@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""快速测试脚本"""
 
 import yaml
 from loguru import logger
@@ -9,7 +8,6 @@ from src.rag_system import MedicalRAGSystem
 
 
 def main():
-    """主函数"""
     # 加载环境变量
     load_dotenv()
     

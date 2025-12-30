@@ -11,7 +11,6 @@ from src.evaluation import RAGEvaluator
 
 
 def main():
-    """主函数"""
     # 配置日志
     logger.add(
         "logs/evaluation.log",
@@ -27,7 +26,6 @@ def main():
     logger.info("开始RAG系统评估")
     logger.info("="*60)
     
-    # 加载配置
     with open('config.yaml', 'r', encoding='utf-8') as f:
         config = yaml.safe_load(f)
     

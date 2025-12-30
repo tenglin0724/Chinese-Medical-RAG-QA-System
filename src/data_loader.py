@@ -193,15 +193,6 @@ class CMedQA2Loader:
 
 
 def preprocess_text(text: str) -> str:
-    """
-    文本预处理
-    
-    Args:
-        text: 原始文本
-        
-    Returns:
-        预处理后的文本
-    """
     if not text:
         return ""
     
